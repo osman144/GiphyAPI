@@ -11,7 +11,7 @@
 function getData() {
 
 var input = $('#searchtext').val();
-var xhr = $.get("http://api.giphy.com/v1/gifs/search?q=" +input+ "&api_key=rIQtqBsnwS9APOr97WLCDTut7pW8ETYu&limit=10");
+var xhr = $.get("https://api.giphy.com/v1/gifs/search?q=" +input+ "&api_key=rIQtqBsnwS9APOr97WLCDTut7pW8ETYu&limit=10");
 xhr.done(function(response) { console.log("success got data", response);
 
 let jiffs = response.data 

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+
+  <meta charset="UTF-8">
+  <title>CoderBay</title>
+
+  <!-- jQuery -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+  <!-- Bootstrap CDN-->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+  <!-- Firebase Reference -->
+  <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
+
+
+</head>
+
+<body>
+
+  <div class="container">
+
+    <br>
+
+    <!-- Jumbotron Title -->
+    <div class="jumbotron">
+      <h1 class="text-center">Welcome to CodersBay</h1>
+      <h3 class="text-center">"Where bidders win big."</h3>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <h3 class="text-center"><strong>Today's Sale</strong>: Pure Vegetarian-Based Coding Knowledge (Chewable)</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Current Product -->
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-sm-4 col-sm-offset-2">
+                <img class="img-responsive thumbnail center-block" src="http://graphitepublications.com/wp-content/uploads/2015/04/5-Coding-Challenges-to-Help-You-Train-Your-Brain.jpg" alt="Coding Brain">
+              </div>
+              <div class="col-sm-6">
+                <h3 class=""><strong>Highest Bidder:</strong> <span id="highest-bidder"></span></h3>
+                <h3 class=""><strong>Current Price:</strong> <span id="highest-price"></span></h3>
+                <hr>
+                <h3 class="">Hurry! <strong><span id="connected-viewers"></span></strong> people have their eyes on the prize.</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Make Your Bid -->
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Make Your Bid</h3>
+          </div>
+          <div class="panel-body">
+            <form>
+              <div class="form-group">
+                <label for="bidder-name">Your Name</label>
+                <input class="form-control" id="bidder-name" type="text">
+              </div>
+              <div class="form-group">
+                <label for="bidder-price">Your Price</label>
+                <input class="form-control" id="bidder-price" type="number">
+              </div>
+              <button class="btn btn-primary" id="submit-bid" type="submit">Submit</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Script -->
+  <script>
+  /* global moment firebase */
+
+// Initialize Firebase
+// Make sure to match the configuration to the script version number in the HTML
+// (Ex. 3.0 != 3.7.0)         
+// Initialize Firebase
+var config = {
+    apiKey: "AIzaSyCVlUExgT46ebNpqlnIMW1qqGkHweViGjw",
+    authDomain: "practicefirebase-15773.firebaseapp.com",
+    databaseURL: "https://practicefirebase-15773.firebaseio.com",
+    projectId: "practicefirebase-15773",
+    storageBucket: "practicefirebase-15773.appspot.com",
+    messagingSenderId: "812952195619"
+  };
+  firebase.initializeApp(config);
+
+
+// Create a variable to reference the database.
+var database = firebase.database();
+
+
+
+
+// Initial Values
+var initialBid = 0;
+var initialBidder = "DO SOMETHING!";
+var highPrice = initialBid;
+var highBidder = initialBidder;
+
+// --------------------------------------------------------------
+
+// At the initial load and subsequent value changes, get a snapshot of the stored data.
+// This function allows you to update your page in real-time when the firebase database changes.
+database.ref().on("value", function(snapshot) {
+
+  // If Firebase has a highPrice and highBidder stored (first case)
+  if (snapshot.child("highBidder").exists() && snapshot.child("highPrice").exists()) {
+
+    // Set the variables for highBidder/highPrice equal to the stored values in firebase.
+    // highPrice = ...
+    // highBidder = ...
+    highBidder = snapshot.val().highBidder;
+    highPrice = parseInt(snapshot.val().highPrice);
+
+
+    // Change the HTML to reflect the stored values
+    ("#highest-bidder").text(highBidder);
+    $("#highest-price").text("$" + highPrice);
+
+
+    // Print the data to the console.
+    console.log(highBidder)
+    console.log(highPrice)
+
+
+
+  }
+
+  // Else Firebase doesn't have a highPrice/highBidder, so use the initial local values.
+  else {
+
+    // Change the HTML to reflect the initial values
+    $("#highest-bidder").text(highBidder);
+    $("#highest-price").text("$" + highPrice);
+
+
+    // Print the data to the console.
+    console.log(highBidder);
+    console.log(highPrice);
+
+
+  }
+
+
+// If any errors are experienced, log them to console.
+}, function(errorObject) {
+  console.log("The read failed: " + errorObject.code);
+});
+
+// --------------------------------------------------------------
+
+// Whenever a user clicks the submit-bid button
+$("#submit-bid").on("click", function(event) {
+  // Prevent form from submitting
+  event.preventDefault();
+
+  // Get the input values
+  let name = $('#bidder-name').val().trim();
+  let bid = parseInt($('#bidder-price').val().trim());
+
+
+  // Log the Bidder and Price (Even if not the highest)
+  if (bid > highPrice) {
+
+    // Alert
+    alert("You are now the highest bidder.");
+
+    // Save the new price in Firebase
+    database.ref("bidderData").set({
+      highBidder: name,
+      highPrice: bid
+    });
+
+
+
+    // Log the new High Price
+    console.log(highPrice);
+
+
+    // Store the new high price and bidder name as a local variable
+    highBidder=name;
+    highPrice=bid
+
+
+    // Change the HTML to reflect the new high price and bidder
+    $("#highest-bidder").text(name);
+    $("#highest-price").text("$" + bid);
+
+  }
+
+  else {
+    // Alert
+    alert("Sorry that bid is too low. Try again.");
+
+  }
+
+});
+</script>
+
+</body>
+
+</html>

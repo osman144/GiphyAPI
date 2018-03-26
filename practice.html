@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+  <head>
+
+    <meta charset="UTF-8">
+    <title>Click Button with Firebase!</title>
+
+    <!-- -->
+    <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
+
+  </head>
+
+  <body>
+
+    <!-- -->
+    <h1>Ouch! You've clicked me <span id="click-value"></span> times!</h1>
+
+    <!-- -->
+    <button id="click-button">Click Me!!!!</button>
+
+    <!-- -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+  <!-- ================================================================================== -->
+    <script>
+
+    var config = {
+    apiKey: "AIzaSyCVlUExgT46ebNpqlnIMW1qqGkHweViGjw",
+    authDomain: "practicefirebase-15773.firebaseapp.com",
+    databaseURL: "https://practicefirebase-15773.firebaseio.com",
+    projectId: "practicefirebase-15773",
+    storageBucket: "practicefirebase-15773.appspot.com",
+    messagingSenderId: "812952195619"
+  };
+  firebase.initializeApp(config);
+
+    // VARIABLES
+    // --------------------------------------------------------------------------------
+
+    var database = firebase.database();
+    var clickCounter = 0;
+
+    // FUNCTIONS + EVENTS
+    // --------------------------------------------------------------------------------
+
+    $("#click-button").on("click", function() {
+      clickCounter++;
+      database.ref().set({
+        clickCount : clickCounter
+      });
+    });
+
+    // MAIN PROCESS + INITIAL CODE
+    // --------------------------------------------------------------------------------
+
+    //On value listens for a change in the data base. When value changes, run the function snapshot 
+    database.ref().on("value", function(snapshot) {
+      console.log(snapshot.val());
+      $("#click-value").text(snapshot.val().clickCount);
+      clickCounter = snapshot.val().clickCount;
+    }, function(errorObject) {
+      console.log("The read failed: " + errorObject.code);
+    });
+
+    </script>
+
+  </body>
+
+</html>
